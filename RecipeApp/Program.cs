@@ -2,9 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using RecipeApp;
 using RecipeApp.Authorization;
 using RecipeApp.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Authorization;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +20,23 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
 builder.Services.AddScoped<RecipeService>();
 builder.Services.AddScoped<IAuthorizationHandler,IsRecipeOwnerHandler>();
 
+builder.Host.UseSerilog((hostContext, services, configuration) =>
+{
+    configuration.WriteTo.File("Log");
+    configuration.WriteTo.Console();
+});
+builder.Host.UseContentRoot(Directory.GetCurrentDirectory())
+    .ConfigureAppConfiguration(config => config.AddJsonFile("appsettings.json")).ConfigureLogging((ctx, builder) => 
+    {
+        builder.AddConfiguration(ctx.Configuration.GetSection("Logging"));
+        builder.AddConsole(); 
+    });
+
+Host.CreateDefaultBuilder(args).ConfigureLogging(builder => builder.AddSeq()).ConfigureWebHost(webBuilder =>
+{
+    webBuilder.UseStartup<StartupBase>();
+});
+
 Host.CreateDefaultBuilder(args).ConfigureWebHost(webBuilder =>
 {
     webBuilder.UseKestrel();
@@ -29,6 +45,9 @@ Host.CreateDefaultBuilder(args).ConfigureWebHost(webBuilder =>
 });
 
 builder.Services.AddAuthorization(options => options.AddPolicy("CanManageRecipe", policyBuilder => policyBuilder.AddRequirements(new IsRecipeOwnerRequirement())));
+
+builder.Services.AddHsts(options=>options.MaxAge=TimeSpan.FromHours(1));
+
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.

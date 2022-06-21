@@ -7,8 +7,17 @@ namespace RecipeApp.Pages
     public class IndexModel : PageModel
     {
         private readonly RecipeService _service;
+        private readonly ILogger<IndexModel> _logger;
         public IEnumerable<RecipeSummary> Recipes { get; private set; }
-        public IndexModel(RecipeService service) => _service = service;
-        public async Task OnGet() => Recipes = await _service.GetRecipes();
+        public IndexModel(RecipeService service, ILogger<IndexModel> logger)
+        {
+            _service = service;
+            _logger = logger;
+        }
+        public async Task OnGet()
+        {
+            Recipes = await _service.GetRecipes();
+            _logger.LogInformation($"Loaded {Recipes.Count()} recipes");
+        }
     }
 }
