@@ -25,6 +25,16 @@ namespace RecipeApp
             })
                 .ToListAsync();
         }
+        public async Task<List<RecipeSummary>> GetRecipesForUser(string? userId,int count)
+        {
+            return await _context.Recipes.Where(recipe => !recipe.IsDeleted && recipe.CreatedById==userId).Take(count).Select(recipe => new RecipeSummary
+            {
+                Id = recipe.RecipeId,
+                Name = recipe.Name,
+                TimeToCook = $"{recipe.TimeToCook.Hours}hrs {recipe.TimeToCook.Minutes}mins"
+            })
+                .ToListAsync();
+        }
         public async Task<RecipeDetail> GetRecipeDetail(int id)
         {
             return await _context.Recipes.Where(recipe => recipe.RecipeId == id && !recipe.IsDeleted).Select(recipe => new RecipeDetail

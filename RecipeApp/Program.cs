@@ -4,12 +4,12 @@ using RecipeApp.Authorization;
 using RecipeApp.Data;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-
 
 builder.Services.AddDbContext<AppDbContext>(options => 
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -48,8 +48,9 @@ builder.Services.AddAuthorization(options => options.AddPolicy("CanManageRecipe"
 
 builder.Services.AddHsts(options=>options.MaxAge=TimeSpan.FromHours(1));
 
-
+builder.Services.AddControllers().AddFluentValidation();
 var app = builder.Build();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
