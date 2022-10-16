@@ -1,7 +1,7 @@
 ﻿using RecipeApp.Models;
 using RecipeApp.Data;
 using Microsoft.EntityFrameworkCore;
-
+//update-database в диспетчере пакетов
 namespace RecipeApp
 { 
     public class RecipeService
